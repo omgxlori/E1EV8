@@ -27,129 +27,78 @@ const getWeekEndDate = (startDate) => {
 const HabitTable = () => {
   const [habits, setHabits] = useState(() => {
     const savedHabits = localStorage.getItem('habits');
-    return savedHabits ? JSON.parse(savedHabits) : ['Exercise', 'Read a Book', 'Meditate', 'Drink Water'];
+    return savedHabits ? JSON.parse(savedHabits) : [];
   });
-
   const [newHabit, setNewHabit] = useState('');
-  const [editingHabitIndex, setEditingHabitIndex] = useState(null);
-  const [editingHabitText, setEditingHabitText] = useState('');
-  const [currentWeekStartDate, setCurrentWeekStartDate] = useState(getWeekStartDate());
   const [checkedBoxes, setCheckedBoxes] = useState(() => {
-    const savedData = localStorage.getItem(`habitProgress_${getWeekStartDate().toDateString()}`);
-    return savedData ? JSON.parse(savedData) : Array.from({ length: 4 }, () => Array(7).fill(false));
+    const savedCheckedBoxes = localStorage.getItem('checkedBoxes');
+    return savedCheckedBoxes ? JSON.parse(savedCheckedBoxes) : {};
   });
-
   const [showConfetti, setShowConfetti] = useState(false);
-  const [greeting, setGreeting] = useState('');
-  const [timeUntilBedtime, setTimeUntilBedtime] = useState('');
-  const userName = 'User'; // Replace this with the actual user's name
-  const bedtime = '22:00'; // Replace this with the user's set bedtime in 24-hour format (HH:mm)
+  const [currentWeekStartDate, setCurrentWeekStartDate] = useState(getWeekStartDate(0));
 
-  // Create a greeting based on the time of day
-  useEffect(() => {
-    const currentHour = new Date().getHours();
-    if (currentHour < 12) {
-      setGreeting(`Good Morning, ${userName}`);
-    } else if (currentHour < 18) {
-      setGreeting(`Good Afternoon, ${userName}`);
-    } else {
-      setGreeting(`Good Evening, ${userName}`);
-    }
-  }, [userName]);
-
-  // Calculate time until bedtime
-  useEffect(() => {
-    const calculateTimeUntilBedtime = () => {
-      const [bedHour, bedMinute] = bedtime.split(':').map(Number);
-      const now = new Date();
-      const bedTime = new Date();
-      bedTime.setHours(bedHour, bedMinute, 0, 0);
-
-      if (now > bedTime) {
-        bedTime.setDate(bedTime.getDate() + 1);
-      }
-
-      const diffMs = bedTime - now;
-      const diffHrs = Math.floor(diffMs / (1000 * 60 * 60));
-      const diffMins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-      setTimeUntilBedtime(`${diffHrs} hrs and ${diffMins} minutes until bedtime`);
-    };
-
-    calculateTimeUntilBedtime();
-    const interval = setInterval(calculateTimeUntilBedtime, 60000);
-    return () => clearInterval(interval);
-  }, [bedtime]);
-
-  // Load progress for the current week from local storage
-  useEffect(() => {
-    const weekKey = `habitProgress_${currentWeekStartDate.toDateString()}`;
-    const savedData = localStorage.getItem(weekKey);
-    if (savedData) {
-      setCheckedBoxes(JSON.parse(savedData));
-    } else {
-      setCheckedBoxes(Array.from({ length: habits.length }, () => Array(7).fill(false)));
-    }
-  }, [currentWeekStartDate, habits.length]);
-
-  // Save progress to local storage whenever checkboxes or week change
-  useEffect(() => {
-    const weekKey = `habitProgress_${currentWeekStartDate.toDateString()}`;
-    localStorage.setItem(weekKey, JSON.stringify(checkedBoxes));
-  }, [checkedBoxes, currentWeekStartDate]);
-
-  // Save habits to local storage whenever the habits list changes
+  // Save habits and checkedBoxes to localStorage
   useEffect(() => {
     localStorage.setItem('habits', JSON.stringify(habits));
   }, [habits]);
 
-  // Function to navigate to the next or previous week
-  const changeWeek = (offset) => {
-    const newWeekStartDate = new Date(currentWeekStartDate);
-    newWeekStartDate.setDate(newWeekStartDate.getDate() + offset * 7);
-    setCurrentWeekStartDate(newWeekStartDate);
-  };
+  useEffect(() => {
+    localStorage.setItem('checkedBoxes', JSON.stringify(checkedBoxes));
+  }, [checkedBoxes]);
 
+  // Handle adding a new habit
   const addHabit = () => {
     if (newHabit.trim() === '') return;
+
+    // Add the new habit to the list of habits
     setHabits((prevHabits) => [...prevHabits, newHabit]);
-    setCheckedBoxes((prevCheckedBoxes) => [
-      ...prevCheckedBoxes,
+
+    // Initialize the checkboxes for the new habit in the current week
+    const newCheckedBoxes = { ...checkedBoxes };
+    const weekKey = currentWeekStartDate.toDateString();
+    newCheckedBoxes[weekKey] = [
+      ...(newCheckedBoxes[weekKey] || []),
       Array(7).fill(false), // Add a new row of checkboxes for the new habit
-    ]);
+    ];
+    setCheckedBoxes(newCheckedBoxes);
+
     setNewHabit('');
   };
 
-  const startEditingHabit = (index) => {
-    setEditingHabitIndex(index);
-    setEditingHabitText(habits[index]);
-  };
-
-  const saveEditedHabit = () => {
-    const updatedHabits = [...habits];
-    updatedHabits[editingHabitIndex] = editingHabitText;
-    setHabits(updatedHabits);
-    setEditingHabitIndex(null);
-    setEditingHabitText('');
-  };
-
-  const deleteHabit = (index) => {
-    const updatedHabits = habits.filter((_, habitIndex) => habitIndex !== index);
-    const updatedCheckedBoxes = checkedBoxes.filter((_, habitIndex) => habitIndex !== index);
-    setHabits(updatedHabits);
-    setCheckedBoxes(updatedCheckedBoxes);
-  };
-
+  // Handle checkbox change (toggle checkbox)
   const handleCheckboxChange = (habitIndex, dayIndex) => {
-    const newCheckedBoxes = checkedBoxes.map((habit, index) =>
-      index === habitIndex ? habit.map((checked, i) => (i === dayIndex ? !checked : checked)) : habit
+    const newCheckedBoxes = { ...checkedBoxes };
+    const weekKey = currentWeekStartDate.toDateString();
+    newCheckedBoxes[weekKey] = newCheckedBoxes[weekKey].map((habit, index) =>
+      index === habitIndex
+        ? habit.map((checked, i) => (i === dayIndex ? !checked : checked))
+        : habit
     );
     setCheckedBoxes(newCheckedBoxes);
   };
 
+  // Navigate to the next or previous week
+  const changeWeek = (offset) => {
+    const newWeekStartDate = new Date(currentWeekStartDate);
+    newWeekStartDate.setDate(newWeekStartDate.getDate() + offset * 7);
+    setCurrentWeekStartDate(newWeekStartDate);
+
+    const weekKey = newWeekStartDate.toDateString();
+    if (!(weekKey in checkedBoxes)) {
+      setCheckedBoxes((prevCheckedBoxes) => ({
+        ...prevCheckedBoxes,
+        [weekKey]: habits.map(() => Array(7).fill(false)), // Initialize checkboxes for the new week
+      }));
+    }
+  };
+
+  // Calculate the total checkboxes and progress percentage
   const totalCheckboxes = habits.length * 7;
-  const checkedCount = checkedBoxes.flat().filter(Boolean).length;
+  const checkedCount =
+    (checkedBoxes[currentWeekStartDate.toDateString()]?.flat().filter(Boolean).length || 0);
   const percentage = Math.round((checkedCount / totalCheckboxes) * 100);
 
+  // Show confetti if all checkboxes are checked
   useEffect(() => {
     if (percentage === 100) {
       setShowConfetti(true);
@@ -161,8 +110,6 @@ const HabitTable = () => {
 
   return (
     <div>
-      <h2>{greeting}</h2>
-      <p>{timeUntilBedtime}</p>
       <h2>Habit Tracker</h2>
       <p>{percentage}% achieved</p>
       {showConfetti && <Confetti />}
@@ -197,7 +144,15 @@ const HabitTable = () => {
         </span>
         <button onClick={() => changeWeek(1)}>Next Week →</button>
       </div>
-      <div className="add-habit" style={{ margin: '20px 0', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <div
+        className="add-habit"
+        style={{
+          margin: '20px 0',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+        }}
+      >
         <input
           type="text"
           value={newHabit}
@@ -223,29 +178,16 @@ const HabitTable = () => {
         <tbody>
           {habits.map((habit, habitIndex) => (
             <tr key={habitIndex}>
-              <td>
-                {editingHabitIndex === habitIndex ? (
-                  <div>
-                    <input
-                      type="text"
-                      value={editingHabitText}
-                      onChange={(e) => setEditingHabitText(e.target.value)}
-                    />
-                    <button onClick={saveEditedHabit}>Save</button>
-                    <button onClick={() => setEditingHabitIndex(null)}>Cancel</button>
-                    <button onClick={() => deleteHabit(habitIndex)}>Delete</button>
-                  </div>
-                ) : (
-                  <span onClick={() => startEditingHabit(habitIndex)}>{habit}</span>
-                )}
-              </td>
+              <td>{habit}</td>
               {Array(7)
                 .fill()
                 .map((_, dayIndex) => (
                   <td key={dayIndex}>
                     <input
                       type="checkbox"
-                      checked={checkedBoxes[habitIndex]?.[dayIndex] || false}
+                      checked={
+                        checkedBoxes[currentWeekStartDate.toDateString()]?.[habitIndex]?.[dayIndex] || false
+                      }
                       onChange={() => handleCheckboxChange(habitIndex, dayIndex)}
                     />
                   </td>
