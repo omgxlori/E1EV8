@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-const SignUpForm = () => {
+const SignupForm = () => {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -51,7 +51,21 @@ const SignUpForm = () => {
         Time Zone:
         <select name="timeZone" value={formData.timeZone} onChange={handleChange} required>
           <option value="">Select Time Zone</option>
-          {/* Add time zone options here */}
+          <option value="Pacific/Honolulu">Hawaii-Aleutian Standard Time (HAST) - UTC-10:00</option>
+          <option value="America/Anchorage">Alaska Standard Time (AKST) - UTC-09:00</option>
+          <option value="America/Los_Angeles">Pacific Standard Time (PST) - UTC-08:00</option>
+          <option value="America/Denver">Mountain Standard Time (MST) - UTC-07:00</option>
+          <option value="America/Chicago">Central Standard Time (CST) - UTC-06:00</option>
+          <option value="America/New_York">Eastern Standard Time (EST) - UTC-05:00</option>
+          <option value="Atlantic/Bermuda">Atlantic Standard Time (AST) - UTC-04:00</option>
+          <option value="Europe/London">Greenwich Mean Time (GMT) - UTC+00:00</option>
+          <option value="Europe/Paris">Central European Time (CET) - UTC+01:00</option>
+          <option value="Asia/Dubai">Gulf Standard Time (GST) - UTC+04:00</option>
+          <option value="Asia/Kolkata">India Standard Time (IST) - UTC+05:30</option>
+          <option value="Asia/Singapore">Singapore Standard Time (SGT) - UTC+08:00</option>
+          <option value="Asia/Tokyo">Japan Standard Time (JST) - UTC+09:00</option>
+          <option value="Australia/Sydney">Australian Eastern Standard Time (AEST) - UTC+10:00</option>
+          {/* Add more time zones as needed */}
         </select>
       </label>
       <label>
@@ -67,4 +81,4 @@ const SignUpForm = () => {
   );
 };
 
-export default SignUpForm;
+export default SignupForm;

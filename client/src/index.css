@@ -5,7 +5,7 @@
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-image: url(nightsky2.gif);
+  background-color: #132631;
   background-position: fixed;
   background-size: cover;
   background-position: center;
@@ -22,7 +22,7 @@ a {
   text-decoration: inherit;
 }
 a:hover {
-  color: #535bf2;
+  color: #132631;
 }
 
 body {
@@ -39,23 +39,59 @@ h1 {
 }
 
 button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
+  background-color: #515e64; /* Match background color of .home-button */
+  color: white; /* White text */
+  border: none; /* No border */
+  padding: 8px 16px; /* Match padding of .home-button */
+  border-radius: 4px; /* Match border radius of .home-button */
+  font-size: 1em; /* Keep font size consistent */
+  font-weight: 500; /* Keep font weight consistent */
+  font-family: inherit; /* Keep font family */
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: background-color 0.3s; /* Smooth transition for background color */
 }
+
 button:hover {
-  border-color: #646cff;
+  background-color: #132631; /* Hover color to match .home-button */
 }
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+
+
+
+div.week-navigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
 }
+
+div.week-navigation button {
+  margin: 0 90px;
+}
+
+div.add-habit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin: 0 auto;
+}
+
+
+table.habit-table {
+  background-color: white;
+  color: black;
+  margin: 0 auto;
+  border-color: black;
+}
+
+
+table.habit-table th,
+table.habit-table td {
+  background-color: #f0f0f0; /* Ensure both headers and cells have the same color */
+  border: 1px solid #ddd; /* Add a subtle border to separate cells, if desired */
+  padding: 10px; /* Add some padding for better spacing */
+}
+
 
 
 /* index.css */
@@ -71,16 +107,38 @@ form {
   color: black;
 }
 
+form label {
+  margin: 5px;
+}
+
+form input {
+  background-color: #515e64;
+}
+
+
+form input,
+form select,
 form button {
-  background-color: #007BFF;
-  color: white;
-  border: none;
-  cursor: pointer;
+  margin-left: 5px; /* Add space between each input/select and the next label */
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+
+form button {
+  background-color: #132631; /* Same background color as .nav-button */
+  color: white; /* White text */
+  border: none; /* No border */
+  padding: 8px 16px; /* Same padding as .nav-button */
+  border-radius: 4px; /* Same border radius */
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: background-color 0.3s;
 }
 
 
 form button:hover {
-  background-color: #0056b3;
+  background-color: #515e64;
 }
 
 

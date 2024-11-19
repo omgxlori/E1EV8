@@ -1,0 +1,25 @@
+.quote-container {
+    background-color: #f9f9f9; /* Light background for contrast */
+    border: 1px solid #ddd; /* Subtle border for definition */
+    border-radius: 10px; /* Rounded corners */
+    padding: 20px; /* Space inside the container */
+    margin: 20px auto; /* Center and add vertical space */
+    max-width: 600px; /* Limit the width for readability */
+    text-align: center; /* Center the text */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add a soft shadow */
+  }
+  
+  .quote {
+    font-size: 1.5em; /* Make the quote text larger */
+    font-weight: bold; /* Bold text for emphasis */
+    color: #333; /* Dark text for readability */
+    margin-bottom: 10px; /* Space between the quote and author */
+    font-style: italic; /* Italicize the quote for style */
+  }
+  
+  .author {
+    font-size: 1em; /* Standard size for the author */
+    color: #666; /* Lighter text color for the author */
+    font-weight: normal; /* Normal weight for the author */
+  }
+  
