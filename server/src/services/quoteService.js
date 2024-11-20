@@ -1,32 +1,19 @@
-import fetch from 'node-fetch';
-import https from 'https';
+import fetch from 'node-fetch'; // Import fetch
 
 export const fetchRandomQuote = async () => {
   try {
-    // List of tags you want to include
-    const tags = [
-      'change', 'character', 'courage', 'creativity', 'future',
-      'gratitude', 'honor', 'inspirational', 'knowledge', 'leadership',
-      'life', 'motivational', 'opportunity', 'perseverance', 'power',
-      'success'
-    ];
-
-    // Join tags into a comma-separated string
-    const tagsString = tags.join(',');
-
-    // Update the API URL to include the tags
-    const response = await fetch(`https://api.quotable.io/random?tags=${tagsString}`);
-
+    // Fetch a random quote from ZenQuotes API
+    const response = await fetch('https://zenquotes.io/api/random');
+    
     if (!response.ok) {
-      console.error('HTTP error:', response.status, response.statusText);
-      throw new Error(`HTTP error: ${response.status} ${response.statusText}`);
+      throw new Error('Error fetching quote');
     }
 
+    // Parse the response as JSON and return the quote text
     const data = await response.json();
-    return data;
+    return data[0].q; // Returning the quote text
   } catch (error) {
-    console.error('Error in fetchRandomQuote:', error.message);
+    console.error(error);
     throw new Error('Failed to fetch quote');
   }
 };
-

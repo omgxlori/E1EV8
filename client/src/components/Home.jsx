@@ -4,7 +4,7 @@ import './Home.css'; // Import your CSS file
 
 const Home = () => {
   const [fadeIn, setFadeIn] = useState(false);
-  const [breathingText, setBreathingText] = useState('breathe out');
+  const [breathingText, setBreathingText] = useState('breathe in'); // Initially set to 'breathe in'
   const navigate = useNavigate(); // Initialize the navigation function
 
   useEffect(() => {
@@ -12,7 +12,7 @@ const Home = () => {
 
     // Set up an interval to switch between "breathe in" and "breathe out"
     const interval = setInterval(() => {
-      setBreathingText((prevText) => (prevText === 'breathe out' ? 'breathe in' : 'breathe out'));
+      setBreathingText((prevText) => (prevText === 'breathe in' ? 'breathe out' : 'breathe in')); // Reverse the logic
     }, 2000); // Change text every 2 seconds (half of the 4s animation duration)
 
     return () => clearInterval(interval); // Clean up the interval on component unmount

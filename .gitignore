@@ -1,0 +1,28 @@
+# Node.js dependencies
+node_modules/
+
+# Environment variables (store sensitive data like DB URL, API keys)
+.env
+
+# Log files
+*.log
+
+# npm package lock files (optional)
+package-lock.json
+
+# IDE settings (VSCode, IntelliJ, etc.)
+.vscode/
+.idea/
+
+# Mac system files
+.DS_Store
+
+# Build output (e.g., dist, build)
+dist/
+build/
+
+# .env file (if storing sensitive data like keys, secrets)
+.env
+
+# Debugging files
+.debug/

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import Confetti from 'react-confetti';
+import MotivationalQuote from './MotivationalQuote';
 
 // Helper function to format the date as "Day, Month Date"
 const formatDate = (date) => {
@@ -24,36 +25,30 @@ const getWeekEndDate = (startDate) => {
   return endDate;
 };
 
+// Function to determine the time of day
+const getGreeting = () => {
+  const hours = new Date().getHours();
+  if (hours >= 5 && hours < 12) return 'Good morning';
+  if (hours >= 12 && hours < 18) return 'Good afternoon';
+  return 'Good evening';
+};
+
 const HabitTable = () => {
-  const [habits, setHabits] = useState(() => {
-    const savedHabits = localStorage.getItem('habits');
-    return savedHabits ? JSON.parse(savedHabits) : [];
-  });
+  const [habits, setHabits] = useState([]); // Store habits
   const [newHabit, setNewHabit] = useState('');
-  const [checkedBoxes, setCheckedBoxes] = useState(() => {
-    const savedCheckedBoxes = localStorage.getItem('checkedBoxes');
-    return savedCheckedBoxes ? JSON.parse(savedCheckedBoxes) : {};
-  });
+  const [checkedBoxes, setCheckedBoxes] = useState({});
   const [showConfetti, setShowConfetti] = useState(false);
   const [currentWeekStartDate, setCurrentWeekStartDate] = useState(getWeekStartDate(0));
 
-  // Save habits and checkedBoxes to localStorage
-  useEffect(() => {
-    localStorage.setItem('habits', JSON.stringify(habits));
-  }, [habits]);
-
-  useEffect(() => {
-    localStorage.setItem('checkedBoxes', JSON.stringify(checkedBoxes));
-  }, [checkedBoxes]);
+  // Hardcoded user name for now (replace with dynamic authentication logic)
+  const userName = 'John Doe';  // Replace with dynamic user info (e.g., from login)
 
   // Handle adding a new habit
   const addHabit = () => {
     if (newHabit.trim() === '') return;
 
-    // Add the new habit to the list of habits
     setHabits((prevHabits) => [...prevHabits, newHabit]);
 
-    // Initialize the checkboxes for the new habit in the current week
     const newCheckedBoxes = { ...checkedBoxes };
     const weekKey = currentWeekStartDate.toDateString();
     newCheckedBoxes[weekKey] = [
@@ -110,8 +105,13 @@ const HabitTable = () => {
 
   return (
     <div>
-      <h2>Habit Tracker</h2>
-      <p>{percentage}% achieved</p>
+      {/* Display greeting based on the time of day */}
+      <h2>{getGreeting()}, {userName ? userName : 'User'}!</h2>
+
+      {/* Motivational quote */}
+      <MotivationalQuote />
+
+      <p>{percentage}% achieved for this week</p>
       {showConfetti && <Confetti />}
       <div
         className="w3-light-grey w3-round-xlarge"
