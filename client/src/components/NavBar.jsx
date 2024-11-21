@@ -20,8 +20,6 @@ const NavBar = () => {
           <li><Link to="/">Home</Link></li> {/* Use Link for Home navigation */}
           <li><a href="#about">About</a></li>
           <li><Link to="/habit-tracker">Habit Tracker</Link></li> {/* Use Link for Habit Tracker */}
-          <li><a href="#mood-tracker">Mood Tracker</a></li>
-          <li><a href="#milestones">Milestones</a></li>
         </ul>
       </div>
       <div className="nav-right">

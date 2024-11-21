@@ -68,14 +68,6 @@ const SignupForm = () => {
           {/* Add more time zones as needed */}
         </select>
       </label>
-      <label>
-        Preferred Bedtime:
-        <input type="time" name="bedtime" value={formData.bedtime} onChange={handleChange} required />
-      </label>
-      <label>
-        Receive Notifications:
-        <input type="checkbox" name="notifications" checked={formData.notifications} onChange={handleChange} />
-      </label>
       <button type="submit">Sign Up</button>
     </form>
   );

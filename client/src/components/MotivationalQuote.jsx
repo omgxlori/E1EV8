@@ -11,7 +11,7 @@ const MotivationalQuote = () => {
         const response = await fetch('http://localhost:5000/api/quote'); // Fetch from your server API
         const quoteData = await response.json();
         setQuote(quoteData); // ZenQuotes only sends the quote string, not an object
-        setAuthor('Unknown'); // Author is not provided, so we set it to 'Unknown'
+        setAuthor('Just A Quick Thought'); // Author is not provided, so we set it to 'Unknown'
       } catch (error) {
         console.error('Error fetching the quote:', error);
         setQuote('Stay motivated!'); // Fallback quote

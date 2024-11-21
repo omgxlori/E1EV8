@@ -1,0 +1,33 @@
+/* Container for habit name and buttons */
+.habit-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%; /* Ensures full width for habit name and buttons */
+  }
+  
+  /* Styling for the buttons container */
+  .habit-buttons {
+    display: flex;
+    gap: 10px; /* Adds space between the buttons */
+  }
+  
+  /* Style buttons */
+  table.habit-table td button {
+    margin-left: 10px;
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+  
+  /* Add hover effect for buttons */
+  table.habit-table td button:hover {
+    background-color: #ddd;
+  }
+  
+  /* Style input field for editing */
+  .edit-input {
+    padding: 5px;
+    width: 200px;
+    margin-right: 10px;
+  }
+  

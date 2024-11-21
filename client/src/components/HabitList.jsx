@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import Confetti from 'react-confetti';
 import MotivationalQuote from './MotivationalQuote';
+import './HabitList.css';
 
 // Helper function to format the date as "Day, Month Date"
 const formatDate = (date) => {
@@ -35,19 +36,42 @@ const getGreeting = () => {
 
 const HabitTable = () => {
   const [habits, setHabits] = useState([]); // Store habits
-  const [newHabit, setNewHabit] = useState('');
-  const [checkedBoxes, setCheckedBoxes] = useState({});
+  const [newHabit, setNewHabit] = useState(''); // New habit input
+  const [checkedBoxes, setCheckedBoxes] = useState({}); // Stores the checked state for each habit's days
   const [showConfetti, setShowConfetti] = useState(false);
   const [currentWeekStartDate, setCurrentWeekStartDate] = useState(getWeekStartDate(0));
 
-  // Hardcoded user name for now (replace with dynamic authentication logic)
-  const userName = 'John Doe';  // Replace with dynamic user info (e.g., from login)
+  const [editingHabitIndex, setEditingHabitIndex] = useState(null); // Track habit in edit mode
+  const [editingHabitName, setEditingHabitName] = useState(''); // Track the new name when editing
+
+  const userName = 'John Doe'; // Replace with dynamic user info (e.g., from login)
+
+  // Load habits and progress from localStorage (if available)
+  useEffect(() => {
+    const savedHabits = localStorage.getItem('habits');
+    const savedCheckedBoxes = localStorage.getItem('checkedBoxes');
+    const savedWeekStartDate = localStorage.getItem('currentWeekStartDate');
+
+    if (savedHabits) {
+      setHabits(JSON.parse(savedHabits));
+    }
+
+    if (savedCheckedBoxes) {
+      setCheckedBoxes(JSON.parse(savedCheckedBoxes));
+    }
+
+    if (savedWeekStartDate) {
+      setCurrentWeekStartDate(new Date(savedWeekStartDate));
+    }
+  }, []);
 
   // Handle adding a new habit
   const addHabit = () => {
     if (newHabit.trim() === '') return;
 
-    setHabits((prevHabits) => [...prevHabits, newHabit]);
+    const updatedHabits = [...habits, newHabit];
+    setHabits(updatedHabits);
+    localStorage.setItem('habits', JSON.stringify(updatedHabits)); // Save to localStorage
 
     const newCheckedBoxes = { ...checkedBoxes };
     const weekKey = currentWeekStartDate.toDateString();
@@ -56,6 +80,7 @@ const HabitTable = () => {
       Array(7).fill(false), // Add a new row of checkboxes for the new habit
     ];
     setCheckedBoxes(newCheckedBoxes);
+    localStorage.setItem('checkedBoxes', JSON.stringify(newCheckedBoxes)); // Save to localStorage
 
     setNewHabit('');
   };
@@ -70,21 +95,43 @@ const HabitTable = () => {
         : habit
     );
     setCheckedBoxes(newCheckedBoxes);
+
+    // Save the updated checked state to localStorage
+    localStorage.setItem('checkedBoxes', JSON.stringify(newCheckedBoxes));
   };
 
-  // Navigate to the next or previous week
-  const changeWeek = (offset) => {
-    const newWeekStartDate = new Date(currentWeekStartDate);
-    newWeekStartDate.setDate(newWeekStartDate.getDate() + offset * 7);
-    setCurrentWeekStartDate(newWeekStartDate);
+  // Handle edit button click
+  const handleEditClick = (habitIndex) => {
+    setEditingHabitIndex(habitIndex);
+    setEditingHabitName(habits[habitIndex]);
+  };
 
-    const weekKey = newWeekStartDate.toDateString();
-    if (!(weekKey in checkedBoxes)) {
-      setCheckedBoxes((prevCheckedBoxes) => ({
-        ...prevCheckedBoxes,
-        [weekKey]: habits.map(() => Array(7).fill(false)), // Initialize checkboxes for the new week
-      }));
-    }
+  // Handle save after editing habit
+  const handleSaveEdit = () => {
+    const updatedHabits = habits.map((habit, index) =>
+      index === editingHabitIndex ? editingHabitName : habit
+    );
+    setHabits(updatedHabits);
+    localStorage.setItem('habits', JSON.stringify(updatedHabits)); // Save to localStorage
+    setEditingHabitIndex(null); // Stop editing
+  };
+
+  // Handle cancel edit
+  const handleCancelEdit = () => {
+    setEditingHabitIndex(null); // Stop editing
+  };
+
+  // Handle delete button click
+  const handleDeleteHabit = (habitIndex) => {
+    const updatedHabits = habits.filter((_, index) => index !== habitIndex);
+    setHabits(updatedHabits);
+    localStorage.setItem('habits', JSON.stringify(updatedHabits)); // Save to localStorage
+
+    const newCheckedBoxes = { ...checkedBoxes };
+    const weekKey = currentWeekStartDate.toDateString();
+    delete newCheckedBoxes[weekKey][habitIndex]; // Remove the habit's checkbox data
+    setCheckedBoxes(newCheckedBoxes);
+    localStorage.setItem('checkedBoxes', JSON.stringify(newCheckedBoxes)); // Save to localStorage
   };
 
   // Calculate the total checkboxes and progress percentage
@@ -137,13 +184,9 @@ const HabitTable = () => {
           {percentage > 0 && <span style={{ color: '#fff', paddingLeft: '10px' }}>{percentage}%</span>}
         </div>
       </div>
-      <div className="week-navigation">
-        <button onClick={() => changeWeek(-1)}>← Previous Week</button>
-        <span>
-          {formatDate(currentWeekStartDate)} - {formatDate(currentWeekEndDate)}
-        </span>
-        <button onClick={() => changeWeek(1)}>Next Week →</button>
-      </div>
+
+      <p>{formatDate(currentWeekStartDate)} - {formatDate(currentWeekEndDate)}</p>
+
       <div
         className="add-habit"
         style={{
@@ -162,6 +205,7 @@ const HabitTable = () => {
         />
         <button onClick={addHabit}>Add Habit</button>
       </div>
+
       <table className="habit-table" border="1" cellPadding="10">
         <thead>
           <tr>
@@ -178,7 +222,25 @@ const HabitTable = () => {
         <tbody>
           {habits.map((habit, habitIndex) => (
             <tr key={habitIndex}>
-              <td>{habit}</td>
+              <td>
+                {editingHabitIndex === habitIndex ? (
+                  <>
+                    <input
+                      type="text"
+                      value={editingHabitName}
+                      onChange={(e) => setEditingHabitName(e.target.value)}
+                    />
+                    <button onClick={handleSaveEdit}>Save</button>
+                    <button onClick={handleCancelEdit}>Cancel</button>
+                  </>
+                ) : (
+                  <>
+                    {habit}
+                    <button onClick={() => handleEditClick(habitIndex)}>Edit</button>
+                    <button onClick={() => handleDeleteHabit(habitIndex)}>Delete</button>
+                  </>
+                )}
+              </td>
               {Array(7)
                 .fill()
                 .map((_, dayIndex) => (

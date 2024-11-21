@@ -9,11 +9,20 @@ export const fetchRandomQuote = async () => {
       throw new Error('Error fetching quote');
     }
 
-    // Parse the response as JSON and return the quote text
+    // Parse the response as JSON
     const data = await response.json();
-    return data[0].q; // Returning the quote text
+    
+    // Return both the quote and the author
+    return {
+      quote: data[0]?.q || 'Stay motivated!', // Fallback quote
+      author: data[0]?.a || 'Just A Quick Thought' // Fallback author
+    };
   } catch (error) {
     console.error(error);
-    throw new Error('Failed to fetch quote');
+    // Return fallback values in case of error
+    return {
+      quote: 'Stay motivated!',
+      author: 'Just A Quick Thought'
+    };
   }
 };
