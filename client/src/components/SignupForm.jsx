@@ -8,8 +8,6 @@ const SignupForm = () => {
     password: '',
     confirmPassword: '',
     timeZone: '',
-    bedtime: '',
-    notifications: false
   });
 
   const handleChange = (e) => {
@@ -20,9 +18,47 @@ const SignupForm = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Add your form submission logic here
+    
+    // Check if password and confirmPassword match
+    if (formData.password !== formData.confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:5000/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          password: formData.password,
+          timeZone: formData.timeZone,
+          confirmPassword: formData.confirmPassword,
+        }),
+      });
+
+      const result = await response.json();
+      
+      if (response.ok) {
+        // Handle successful signup
+        console.log('User created:', result);
+        alert('Sign up successful!');
+        // You can redirect the user or perform any other action here
+      } else {
+        // Handle errors returned from the backend
+        console.error(result.error);
+        alert(result.error || 'Something went wrong');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('An error occurred. Please try again.');
+    }
   };
 
   return (

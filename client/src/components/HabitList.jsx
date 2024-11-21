@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'; 
 import Confetti from 'react-confetti';
 import MotivationalQuote from './MotivationalQuote';
 import './HabitList.css';
@@ -41,10 +41,12 @@ const HabitTable = () => {
   const [showConfetti, setShowConfetti] = useState(false);
   const [currentWeekStartDate, setCurrentWeekStartDate] = useState(getWeekStartDate(0));
 
-  const [editingHabitIndex, setEditingHabitIndex] = useState(null); // Track habit in edit mode
-  const [editingHabitName, setEditingHabitName] = useState(''); // Track the new name when editing
+  const [editingHabitIndex, setEditingHabitIndex] = useState(null); // Index of the habit being edited
+  const [editingHabitName, setEditingHabitName] = useState(''); // New name for the habit
 
-  const userName = 'John Doe'; // Replace with dynamic user info (e.g., from login)
+  // Retrieve user info from localStorage (user is saved here upon successful login)
+  const user = JSON.parse(localStorage.getItem('user')); // Get logged-in user from localStorage
+  const userName = user ? user.firstName : 'User'; // If user is logged in, use their first name, else default to "User"
 
   // Load habits and progress from localStorage (if available)
   useEffect(() => {
@@ -66,7 +68,7 @@ const HabitTable = () => {
   }, []);
 
   // Handle adding a new habit
-  const addHabit = () => {
+  const addHabit = async () => {
     if (newHabit.trim() === '') return;
 
     const updatedHabits = [...habits, newHabit];
@@ -82,7 +84,85 @@ const HabitTable = () => {
     setCheckedBoxes(newCheckedBoxes);
     localStorage.setItem('checkedBoxes', JSON.stringify(newCheckedBoxes)); // Save to localStorage
 
-    setNewHabit('');
+    // Save habit to backend
+    try {
+      const habitData = {
+        habitName: newHabit,
+        completedDays: Array(7).fill(false), // All days are uncompleted by default
+      };
+      await fetch('http://localhost:5000/api/habits', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}` // Send the token to authenticate
+        },
+        body: JSON.stringify(habitData),
+      });
+
+      setNewHabit(''); // Clear input after submission
+    } catch (error) {
+      console.error('Error adding habit:', error);
+      alert('Failed to add habit.');
+    }
+  };
+
+  // Handle editing habit name
+  const handleEditClick = (habitIndex) => {
+    setEditingHabitIndex(habitIndex);
+    setEditingHabitName(habits[habitIndex]);
+  };
+
+  // Save the edited habit
+  const handleSaveEdit = async () => {
+    const updatedHabits = [...habits];
+    updatedHabits[editingHabitIndex] = editingHabitName; // Update the habit name
+  
+    setHabits(updatedHabits);
+    localStorage.setItem('habits', JSON.stringify(updatedHabits)); // Save to localStorage
+    // Save updated habit to backend
+    try {
+      await fetch('http://localhost:5000/api/habits', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          habitName: editingHabitName,
+        }),
+      });
+
+      setEditingHabitIndex(null); // Reset the editing state
+    } catch (error) {
+      console.error('Error saving edited habit:', error);
+      alert('Failed to save edited habit.');
+    }
+  };
+
+  // Cancel habit edit
+  const handleCancelEdit = () => {
+    setEditingHabitIndex(null);
+    setEditingHabitName('');
+  };
+
+  // Handle deleting a habit
+  const handleDeleteHabit = async (habitName) => {
+    try {
+      await fetch('http://localhost:5000/api/habits', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: JSON.stringify({ habitName }),
+      });
+
+      setHabits(habits.filter((habit) => habit !== habitName));
+      alert('Habit deleted successfully');
+    } catch (error) {
+      console.error('Error deleting habit:', error);
+      alert('Failed to delete habit');
+    }
   };
 
   // Handle checkbox change (toggle checkbox)
@@ -98,40 +178,6 @@ const HabitTable = () => {
 
     // Save the updated checked state to localStorage
     localStorage.setItem('checkedBoxes', JSON.stringify(newCheckedBoxes));
-  };
-
-  // Handle edit button click
-  const handleEditClick = (habitIndex) => {
-    setEditingHabitIndex(habitIndex);
-    setEditingHabitName(habits[habitIndex]);
-  };
-
-  // Handle save after editing habit
-  const handleSaveEdit = () => {
-    const updatedHabits = habits.map((habit, index) =>
-      index === editingHabitIndex ? editingHabitName : habit
-    );
-    setHabits(updatedHabits);
-    localStorage.setItem('habits', JSON.stringify(updatedHabits)); // Save to localStorage
-    setEditingHabitIndex(null); // Stop editing
-  };
-
-  // Handle cancel edit
-  const handleCancelEdit = () => {
-    setEditingHabitIndex(null); // Stop editing
-  };
-
-  // Handle delete button click
-  const handleDeleteHabit = (habitIndex) => {
-    const updatedHabits = habits.filter((_, index) => index !== habitIndex);
-    setHabits(updatedHabits);
-    localStorage.setItem('habits', JSON.stringify(updatedHabits)); // Save to localStorage
-
-    const newCheckedBoxes = { ...checkedBoxes };
-    const weekKey = currentWeekStartDate.toDateString();
-    delete newCheckedBoxes[weekKey][habitIndex]; // Remove the habit's checkbox data
-    setCheckedBoxes(newCheckedBoxes);
-    localStorage.setItem('checkedBoxes', JSON.stringify(newCheckedBoxes)); // Save to localStorage
   };
 
   // Calculate the total checkboxes and progress percentage
@@ -153,13 +199,16 @@ const HabitTable = () => {
   return (
     <div>
       {/* Display greeting based on the time of day */}
-      <h2>{getGreeting()}, {userName ? userName : 'User'}!</h2>
+      <h2>{getGreeting()}, {userName}!</h2>
 
       {/* Motivational quote */}
       <MotivationalQuote />
 
+      {/* Display percentage of habit progress */}
       <p>{percentage}% achieved for this week</p>
       {showConfetti && <Confetti />}
+
+      {/* Progress bar */}
       <div
         className="w3-light-grey w3-round-xlarge"
         style={{
@@ -185,17 +234,11 @@ const HabitTable = () => {
         </div>
       </div>
 
+      {/* Date range for current week */}
       <p>{formatDate(currentWeekStartDate)} - {formatDate(currentWeekEndDate)}</p>
 
-      <div
-        className="add-habit"
-        style={{
-          margin: '20px 0',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-        }}
-      >
+      {/* Habit input and add button */}
+      <div className="add-habit" style={{ margin: '20px 0', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <input
           type="text"
           value={newHabit}
@@ -206,6 +249,7 @@ const HabitTable = () => {
         <button onClick={addHabit}>Add Habit</button>
       </div>
 
+      {/* Habit list table */}
       <table className="habit-table" border="1" cellPadding="10">
         <thead>
           <tr>
@@ -217,6 +261,7 @@ const HabitTable = () => {
             <th>Fri</th>
             <th>Sat</th>
             <th>Sun</th>
+            <th>Actions</th> {/* Column for Edit/Delete buttons */}
           </tr>
         </thead>
         <tbody>
@@ -234,11 +279,7 @@ const HabitTable = () => {
                     <button onClick={handleCancelEdit}>Cancel</button>
                   </>
                 ) : (
-                  <>
-                    {habit}
-                    <button onClick={() => handleEditClick(habitIndex)}>Edit</button>
-                    <button onClick={() => handleDeleteHabit(habitIndex)}>Delete</button>
-                  </>
+                  habit
                 )}
               </td>
               {Array(7)
@@ -254,6 +295,10 @@ const HabitTable = () => {
                     />
                   </td>
                 ))}
+              <td>
+                <button onClick={() => handleEditClick(habitIndex)}>Edit</button>
+                <button onClick={() => handleDeleteHabit(habit)}>Delete</button>
+              </td>
             </tr>
           ))}
         </tbody>
