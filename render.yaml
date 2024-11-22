@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: habit-tracker
+    env: node
+    plan: free
+    buildCommand: "npm run build --prefix client && npm run build --prefix server"
+    startCommand: "npm run start"
