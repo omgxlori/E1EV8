@@ -4,6 +4,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "build": "echo 'No build step required for server'",
     "start": "node src/app.js"
   },
   "dependencies": {
