@@ -1,3 +1,4 @@
+// src/App.jsx
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useState, useEffect } from 'react'; // Import useState and useEffect to manage user state
 import NavBar from './components/NavBar';
@@ -5,6 +6,7 @@ import Home from './components/Home'; // Home page component
 import SignupForm from './components/SignupForm';
 import LoginForm from './components/LoginForm';
 import HabitList from './components/HabitList'; // Habit Tracker component
+import LoginRequired from './components/LoginRequired'; // LoginRequired page
 import './App.css';
 
 function App() {
@@ -16,6 +18,8 @@ function App() {
     const token = localStorage.getItem('token');
     if (token) {
       setIsLoggedIn(true); // If token exists, the user is logged in
+      const storedUser = JSON.parse(localStorage.getItem('user'));
+      setUser(storedUser);
     }
   }, []); // Empty array means this runs only once, like componentDidMount
 
@@ -23,6 +27,8 @@ function App() {
   const handleLogin = (user) => {
     setUser(user);
     setIsLoggedIn(true);
+    localStorage.setItem('user', JSON.stringify(user));
+    localStorage.setItem('token', user.token); // Store token if required
   };
 
   // Handle logout by clearing user data and updating login status
@@ -45,9 +51,10 @@ function App() {
             path="/login"
             element={<LoginForm setUser={handleLogin} />} // Pass handleLogin to LoginForm
           />
+          {/* Conditional routing: If user is logged in, show HabitList, else show LoginRequired */}
           <Route
             path="/habit-tracker"
-            element={<HabitList user={user} />} // Pass user to HabitList
+            element={isLoggedIn ? <HabitList user={user} /> : <LoginRequired />}
           />
         </Routes>
       </div>
