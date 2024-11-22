@@ -1,12 +1,12 @@
-import express from 'express'; 
+import express from 'express';
 import cors from 'cors';
-import quoteRoutes from './routes/quoteRoutes.js'; // Import quote routes if any
-import authRoutes from './routes/authRoutes.js';  // Import auth routes for signup and login
-import habitRoutes from './routes/habitRoutes.js';  // Import habit routes to handle habits
-import sequelize from './config/sequelize.js';  // Import Sequelize setup file
+import quoteRoutes from './routes/quoteRoutes.js';
+import authRoutes from './routes/authRoutes.js';  // Import auth routes for signup, login, and user management
+import habitRoutes from './routes/habitRoutes.js'; // Import habit routes to handle habits
+import sequelize from './config/sequelize.js'; // Import Sequelize setup file
 
 import dotenv from 'dotenv'; // Load environment variables
-dotenv.config(); 
+dotenv.config();
 
 console.log('JWT_SECRET:', process.env.JWT_SECRET); // Log to check the value
 

@@ -1,59 +1,63 @@
-import Habit from '../models/Habit.js';  // Import your Habit model
+import Habit from '../models/Habit.js';  // Assuming you have a Habit model
 
-// Controller for handling adding a habit
-export const addHabit = async (req, res) => {
-  const { userId, habitName, completedDays } = req.body; // Get habit name and completion days from the request body
-
-  if (!habitName || !userId || !Array.isArray(completedDays) || completedDays.length !== 7) {
-    return res.status(400).json({ error: 'Invalid data. Habit name, user ID, and days are required.' });
-  }
-
+// Get all habits for a user
+export const getHabits = async (req, res) => {
   try {
-    // Create a new habit for the user
-    const newHabit = await Habit.create({
-      userId,
-      habitName,
-      completedDays,  // Save the completion days array
+    const habits = await Habit.findAll({
+      where: { userId: req.user.id } // Get all habits for the logged-in user
     });
-
-    res.status(201).json({
-      message: 'Habit added successfully',
-      habit: newHabit,
-    });
+    res.json(habits);  // Send back the user's habits
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Failed to add habit' });
+    res.status(500).json({ error: 'Error retrieving habits' });
   }
 };
 
-// Controller for handling updating an existing habit
-export const updateHabit = async (req, res) => {
-  const { id, habitName, completedDays } = req.body;  // Get habit ID, name, and completion days from the request body
-
-  if (!habitName || !Array.isArray(completedDays) || completedDays.length !== 7 || !id) {
-    return res.status(400).json({ error: 'Invalid data. Habit ID, habit name, and days are required.' });
-  }
+// Add a new habit
+export const addHabit = async (req, res) => {
+  const { habitName, completedDays } = req.body;  // Destructure from the request body
 
   try {
-    // Find the habit by ID and update it
-    const habit = await Habit.findByPk(id);
+    const newHabit = await Habit.create({
+      userId: req.user.id,  // Assuming you store userId in the session or token
+      habitName,
+      completedDays
+    });
+    res.status(201).json(newHabit); // Return the newly created habit
+  } catch (error) {
+    res.status(500).json({ error: 'Error creating habit' });
+  }
+};
+
+// Update an existing habit
+export const updateHabit = async (req, res) => {
+  const { habitId, habitName, completedDays } = req.body;
+
+  try {
+    const habit = await Habit.findByPk(habitId);
     if (!habit) {
-      return res.status(404).json({ error: 'Habit not found' });
+      return res.status(404).json({ message: 'Habit not found' });
     }
 
-    // Update the habit with the new name and completion days
-    habit.habitName = habitName;
-    habit.completedDays = completedDays;
-
-    // Save the updated habit
-    await habit.save();
-
-    res.status(200).json({
-      message: 'Habit updated successfully',
-      habit: habit,
-    });
+    await habit.update({ habitName, completedDays });
+    res.json(habit); // Return the updated habit
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Failed to update habit' });
+    res.status(500).json({ error: 'Error updating habit' });
+  }
+};
+
+// Delete a habit
+export const deleteHabit = async (req, res) => {
+  const { habitId } = req.body;
+
+  try {
+    const habit = await Habit.findByPk(habitId);
+    if (!habit) {
+      return res.status(404).json({ message: 'Habit not found' });
+    }
+
+    await habit.destroy();  // Delete the habit from the database
+    res.status(200).json({ message: 'Habit deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ error: 'Error deleting habit' });
   }
 };
