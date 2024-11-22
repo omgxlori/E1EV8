@@ -8,8 +8,6 @@ import sequelize from './config/sequelize.js'; // Import Sequelize setup file
 import dotenv from 'dotenv'; // Load environment variables
 dotenv.config({ path: '../.env' });
 
-console.log('JWT_SECRET:', process.env.JWT_SECRET); // Log to check the value
-
 const app = express();
 
 // Middleware
