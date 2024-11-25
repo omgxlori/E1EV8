@@ -1,12 +1,13 @@
 import express from 'express';
 import cors from 'cors';
 import quoteRoutes from './routes/quoteRoutes.js';
-import authRoutes from './routes/authRoutes.js';  // Import auth routes for signup, login, and user management
+import authRoutes from './routes/authRoutes.js'; // Import auth routes for signup, login, and user management
 import habitRoutes from './routes/habitRoutes.js'; // Import habit routes to handle habits
 import sequelize from './config/sequelize.js'; // Import Sequelize setup file
-
 import dotenv from 'dotenv'; // Load environment variables
-dotenv.config({ path: '../.env' });
+
+// Load environment variables from the server folder's .env file
+dotenv.config({ path: './.env' });
 
 const app = express();
 
@@ -15,12 +16,13 @@ app.use(cors());
 app.use(express.json()); // To parse JSON body from the client
 
 // Routes
-app.use('/', quoteRoutes);  // Handles quote API routes
-app.use('/auth', authRoutes);  // Use '/auth' prefix for signup and login routes
-app.use('/api/habits', habitRoutes);  // Use '/api/habits' prefix for habit-related requests
+app.use('/', quoteRoutes); // Handles quote API routes
+app.use('/auth', authRoutes); // Use '/auth' prefix for signup and login routes
+app.use('/api/habits', habitRoutes); // Use '/api/habits' prefix for habit-related requests
 
 // Test database connection
-sequelize.authenticate()
+sequelize
+  .authenticate()
   .then(() => {
     console.log('Database connected successfully!');
   })
