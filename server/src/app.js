@@ -49,9 +49,13 @@ app.get('*', (req, res) => {
   }
 });
 
-// Test database connection
+// Test and synchronize database connection
 sequelize
-  .authenticate()
+  .sync({ alter: true }) // Ensures tables are created or updated
+  .then(() => {
+    console.log('Database synchronized successfully!');
+    return sequelize.authenticate();
+  })
   .then(() => {
     console.log('Database connected successfully!');
   })
