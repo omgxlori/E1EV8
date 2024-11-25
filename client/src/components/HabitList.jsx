@@ -121,7 +121,7 @@ const HabitTable = () => {
     localStorage.setItem('habits', JSON.stringify(updatedHabits)); // Save to localStorage
     // Save updated habit to backend
     try {
-      await fetch('http://localhost:5000/api/habits', {
+      await fetch('https://e1ev8.onrender.com/api/habits', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -148,7 +148,7 @@ const HabitTable = () => {
   // Handle deleting a habit
   const handleDeleteHabit = async (habitName) => {
     try {
-      await fetch('http://localhost:5000/api/habits', {
+      await fetch('https://e1ev8.onrender.com/api/habits', {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
