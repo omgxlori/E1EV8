@@ -1,6 +1,6 @@
-import path from 'path';
 import express from 'express';
 import cors from 'cors';
+import path from 'path';
 import quoteRoutes from './routes/quoteRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import habitRoutes from './routes/habitRoutes.js';
@@ -17,7 +17,7 @@ app.use(cors());
 app.use(express.json());
 
 // Serve static files from the frontend
-const __dirname = path.resolve(); // Get the current directory
+const __dirname = path.resolve(); // Get the root directory
 app.use(express.static(path.join(__dirname, 'client', 'dist')));
 
 // API Routes

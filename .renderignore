@@ -1,0 +1,4 @@
+# Ignore node_modules everywhere except in the server
+node_modules
+# Do not ignore dist
+!client/dist
