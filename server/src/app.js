@@ -1,4 +1,5 @@
 import path from 'path';
+import fs from 'fs';
 import express from 'express';
 import cors from 'cors';
 import quoteRoutes from './routes/quoteRoutes.js';
@@ -16,9 +17,22 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Corrected path to `dist` folder
+const __dirname = path.resolve(); // Root directory of the project
+const distPath = path.join(__dirname, '..', 'client', 'dist'); // Go up one level, then into client/dist
+const indexPath = path.join(distPath, 'index.html'); // Point to index.html inside dist
+
+// Debugging logs
+console.log('Dist Path:', distPath);
+console.log('Dist Exists:', fs.existsSync(distPath));
+console.log('Index.html Exists:', fs.existsSync(indexPath));
+
 // Serve static files from the frontend
-const __dirname = path.resolve(); // Get the root directory
-app.use(express.static(path.join(__dirname, 'client', 'dist'))); // Adjusted to locate `dist`
+if (fs.existsSync(distPath)) {
+  app.use(express.static(distPath));
+} else {
+  console.error('Dist folder not found. Frontend will not be served.');
+}
 
 // API Routes
 app.use('/quotes', quoteRoutes);
@@ -27,7 +41,12 @@ app.use('/api/habits', habitRoutes);
 
 // Catch-all route to serve React app
 app.get('*', (req, res) => {
-  res.sendFile(path.resolve(__dirname, 'client', 'dist', 'index.html'));
+  if (fs.existsSync(indexPath)) {
+    res.sendFile(indexPath);
+  } else {
+    console.error('Error: index.html not found!');
+    res.status(404).send('Frontend not found.');
+  }
 });
 
 // Test database connection
@@ -43,6 +62,3 @@ sequelize
 // Set up port
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
-console.log('Current working directory:', process.cwd());
-console.log('Serving frontend from:', path.join(__dirname, 'client', 'dist'));
