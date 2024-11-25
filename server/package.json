@@ -25,5 +25,8 @@
   "devDependencies": {
     "concurrently": "^9.1.0",
     "sequelize-cli": "^6.6.2"
+  },
+  "engines": {
+    "node": "16.x"
   }
 }
