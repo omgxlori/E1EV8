@@ -1,31 +1,31 @@
+import path from 'path';
 import express from 'express';
 import cors from 'cors';
-import path from 'path';
 import quoteRoutes from './routes/quoteRoutes.js';
-import authRoutes from './routes/authRoutes.js'; // Import auth routes for signup, login, and user management
-import habitRoutes from './routes/habitRoutes.js'; // Import habit routes to handle habits
-import sequelize from './config/sequelize.js'; // Import Sequelize setup file
-import dotenv from 'dotenv'; // Load environment variables
+import authRoutes from './routes/authRoutes.js';
+import habitRoutes from './routes/habitRoutes.js';
+import sequelize from './config/sequelize.js';
+import dotenv from 'dotenv';
 
-// Load environment variables from the server folder's .env file
+// Load environment variables
 dotenv.config({ path: './.env' });
 
 const app = express();
 
 // Middleware
 app.use(cors());
-app.use(express.json()); // To parse JSON body from the client
+app.use(express.json());
 
 // Serve static files from the frontend
-const __dirname = path.resolve();
+const __dirname = path.resolve(); // Get the current directory
 app.use(express.static(path.join(__dirname, 'client', 'dist')));
 
 // API Routes
-app.use('/quotes', quoteRoutes); // Handles quote API routes
-app.use('/auth', authRoutes); // Use '/auth' prefix for signup and login routes
-app.use('/api/habits', habitRoutes); // Use '/api/habits' prefix for habit-related requests
+app.use('/quotes', quoteRoutes);
+app.use('/auth', authRoutes);
+app.use('/api/habits', habitRoutes);
 
-// Serve the frontend for any other route
+// Catch-all route to serve React app
 app.get('*', (req, res) => {
   res.sendFile(path.resolve(__dirname, 'client', 'dist', 'index.html'));
 });
