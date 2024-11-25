@@ -1,6 +1,6 @@
+import path from 'path';
 import express from 'express';
 import cors from 'cors';
-import path from 'path';
 import quoteRoutes from './routes/quoteRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import habitRoutes from './routes/habitRoutes.js';
@@ -18,7 +18,7 @@ app.use(express.json());
 
 // Serve static files from the frontend
 const __dirname = path.resolve(); // Get the root directory
-app.use(express.static(path.join(__dirname, 'client', 'dist')));
+app.use(express.static(path.join(__dirname, 'client', 'dist'))); // Adjusted to locate `dist`
 
 // API Routes
 app.use('/quotes', quoteRoutes);
@@ -45,3 +45,5 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
 console.log('Current working directory:', process.cwd());
+
+console.log('Serving frontend from:', path.join(__dirname, 'client', 'dist'));
