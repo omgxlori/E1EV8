@@ -18,17 +18,17 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Corrected path to `dist` folder
+// Define paths
 const __dirname = path.resolve(); // Root directory of the project
 const distPath = path.join(__dirname, '..', 'client', 'dist'); // Go up one level, then into client/dist
 const indexPath = path.join(distPath, 'index.html'); // Point to index.html inside dist
 
-// Debugging logs
+// Debugging logs for static file serving
 console.log('Dist Path:', distPath);
 console.log('Dist Exists:', fs.existsSync(distPath));
 console.log('Index.html Exists:', fs.existsSync(indexPath));
 
-// Serve static files from the frontend
+// Serve static files from the React frontend
 if (fs.existsSync(distPath)) {
   app.use(express.static(distPath));
 } else {
@@ -40,22 +40,36 @@ app.use('/quotes', quoteRoutes);
 app.use('/auth', authRoutes);
 app.use('/api/habits', habitRoutes);
 
-// New Route for ZenQuotes API
-app.get('/api/random', async (req, res) => {
+// Route for fetching a quote from ZenQuotes API
+app.get('/api/quote', async (req, res) => {
   try {
+    console.log('Fetching quote from ZenQuotes API...');
     const response = await fetch('https://zenquotes.io/api/random');
+
     if (!response.ok) {
-      throw new Error('Failed to fetch quote');
+      console.error('ZenQuotes API Error:', response.statusText);
+      throw new Error(`ZenQuotes API returned status: ${response.status}`);
     }
+
     const data = await response.json();
-    res.json(data);
+    console.log('ZenQuotes Data:', data);
+
+    if (!data || !Array.isArray(data) || data.length === 0) {
+      throw new Error('No quote received from ZenQuotes');
+    }
+
+    res.json({
+      quote: data[0].q || 'No quote available',
+      author: data[0].a || 'Unknown',
+    });
   } catch (error) {
-    console.error('Error fetching quote:', error);
+    console.error('Error in /api/quote:', error.message);
     res.status(500).json({ error: 'Failed to fetch quote' });
   }
 });
 
-// Catch-all route to serve React app
+
+// Catch-all route for React frontend
 app.get('*', (req, res) => {
   if (fs.existsSync(indexPath)) {
     res.sendFile(indexPath);
@@ -79,6 +93,6 @@ sequelize
     console.error('Unable to connect to the database:', err);
   });
 
-// Set up port
+// Start the server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
