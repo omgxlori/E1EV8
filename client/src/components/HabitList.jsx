@@ -90,7 +90,7 @@ const HabitTable = () => {
         habitName: newHabit,
         completedDays: Array(7).fill(false), // All days are uncompleted by default
       };
-      await fetch('http://localhost:5000/api/habits', {
+      await fetch('https://e1ev8.onrender.com/api/habits', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
