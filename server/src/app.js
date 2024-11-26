@@ -2,6 +2,7 @@ import path from 'path';
 import fs from 'fs';
 import express from 'express';
 import cors from 'cors';
+import fetch from 'node-fetch'; // Ensure this is installed via `npm install node-fetch`
 import quoteRoutes from './routes/quoteRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import habitRoutes from './routes/habitRoutes.js';
@@ -38,6 +39,21 @@ if (fs.existsSync(distPath)) {
 app.use('/quotes', quoteRoutes);
 app.use('/auth', authRoutes);
 app.use('/api/habits', habitRoutes);
+
+// New Route for ZenQuotes API
+app.get('/api/quote', async (req, res) => {
+  try {
+    const response = await fetch('https://zenquotes.io/api/random');
+    if (!response.ok) {
+      throw new Error('Failed to fetch quote');
+    }
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    console.error('Error fetching quote:', error);
+    res.status(500).json({ error: 'Failed to fetch quote' });
+  }
+});
 
 // Catch-all route to serve React app
 app.get('*', (req, res) => {
