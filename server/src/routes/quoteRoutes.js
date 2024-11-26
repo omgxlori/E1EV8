@@ -3,7 +3,7 @@ import { fetchRandomQuote } from '../services/quoteService.js'; // Make sure thi
 
 const router = express.Router();
 
-router.get('/api/quote', async (req, res) => {
+router.get('/api/random', async (req, res) => {
   try {
     // Call the function to fetch a random quote
     const quote = await fetchRandomQuote();

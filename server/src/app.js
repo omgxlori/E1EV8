@@ -41,7 +41,7 @@ app.use('/auth', authRoutes);
 app.use('/api/habits', habitRoutes);
 
 // New Route for ZenQuotes API
-app.get('/api/quote', async (req, res) => {
+app.get('/api/random', async (req, res) => {
   try {
     const response = await fetch('https://zenquotes.io/api/random');
     if (!response.ok) {

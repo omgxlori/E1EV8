@@ -8,7 +8,7 @@ const MotivationalQuote = () => {
   useEffect(() => {
     const getQuote = async () => {
       try {
-        const response = await fetch('https://e1ev8.onrender.com/api/quote'); // Fetch from your server API
+        const response = await fetch('https://e1ev8.onrender.com/api/random'); // Fetch from your server API
         const quoteData = await response.json();
 
         // Set the quote and author correctly
